@@ -1,7 +1,7 @@
 ---
 title: "Regression"
-author: "Your Name"
-date: "2022-12-21"
+author: "Siqi Zhao"
+date: "2024-1-27"
 output: html_document
 editor_options: 
   markdown: 
@@ -310,6 +310,7 @@ Use the following loss function calculator.
 ```{r,echo=show_code}
 calc_loss<-function(prediction,actual){
   difpred <- actual-prediction
+  difpred = na.omit(difpred)
   RMSE <-sqrt(mean(difpred^2))
   operation_loss<-abs(sum(difpred[difpred<0]))+sum(0.1*actual[difpred>0])
   return(
@@ -324,7 +325,7 @@ cannot use automatic variable selection. - You need to explain why you
 added each variable.
 
 ```{r,eval=FALSE,echo=show_code}
-lmfit_2008<- lm(SalePrice ~ `Year Built`+`Neighborhood`+`Lot Frontage`+`Lot Area`+`Total Bsmt SF`, data = ames_raw_2008) # use ames_raw_2008
+lmfit_2008<- lm(log(SalePrice) ~ log(`Lot Area`)+`Year Built`+`Year Remod/Add` + `Total Bsmt SF` + `1st Flr SF` +  log(`Gr Liv Area`) + `Bsmt Full Bath`  + `TotRms AbvGrd` + `Garage Area` + `Wood Deck SF` + `Open Porch SF` , data = ames_raw_2008) # use ames_raw_2008
 lmfit_2008
 ```
 
@@ -343,14 +344,14 @@ Try to answer the following additional questions.
 Your code:
 
 ```{r,echo=TRUE}
-#
+summary(lmfit_2008)
 #
 ```
 
 Your answer:
 
 ```         
-Please write your answer in full sentences.
+It is a good model as all the predictors are statistically significant and the Adjusted R-squared is .8163 which is pretty high. 
 ```
 
 -   Should you include all the predictors? Why?
@@ -359,13 +360,27 @@ Your code:
 
 ```{r,echo=TRUE}
 #
-#
+lmfit_2008all = lm(log(SalePrice) ~ log(`Lot Area`)+`Year Built`+`Year Remod/Add` + `Total Bsmt SF` + `1st Flr SF` + `2nd Flr SF`+ `Low Qual Fin SF` + log(`Gr Liv Area`) + `Full Bath` + `Half Bath`+ `Bsmt Full Bath` + `Bsmt Half Bath` + `TotRms AbvGrd` + `Garage Area` + `Wood Deck SF` + `Open Porch SF` + `Pool Area`, data = ames_raw_2008)
+pred_2009<-exp(predict(lmfit_2008all,newdata=ames_raw_2009))
+calc_loss(pred_2009,ames_raw_2009$SalePrice)
+```
+```{r}
+summary(lmfit_2008all)
 ```
 
+
 Your answer:
+```{r}
+lmfit_2008some = lm(log(SalePrice) ~ log(`Lot Area`)+`Year Built`+`Year Remod/Add` + `Total Bsmt SF` + `1st Flr SF` + `Low Qual Fin SF` + log(`Gr Liv Area`) + `Bsmt Full Bath` + `Bsmt Half Bath` + `TotRms AbvGrd` + `Garage Area` + `Wood Deck SF` + `Open Porch SF` , data = ames_raw_2008)
+pred_2009<-exp(predict(lmfit_2008some,newdata=ames_raw_2009))
+calc_loss(pred_2009,ames_raw_2009$SalePrice)
+```
+```{r}
+summary(lmfit_2008some)
+```
 
 ```         
-Please write your answer in full sentences.
+I tried delete some predictor which has a high p value in the lmfit_2008all model(model with all predictor), however the loss is higher than before. So I think the lmfit_2008all model(model with all predictor) can best predict the price. While I got the highest Adjusted R-squared in lmfit_2008some after delete several predictor. 
 ```
 
 -   What interaction makes sense? Does your model indicate signs of
@@ -374,14 +389,16 @@ Please write your answer in full sentences.
 Your code:
 
 ```{r,echo=TRUE}
-#
-#
+
+lmfit_2008some = lm(log(SalePrice) ~ log(`Lot Area`)+`Year Built`+`Year Remod/Add` + `Total Bsmt SF` + `1st Flr SF` + `Low Qual Fin SF` + log(`Gr Liv Area`) + `Bsmt Full Bath` + `Bsmt Half Bath` + `TotRms AbvGrd` + `Garage Area` + `Wood Deck SF` + `Open Porch SF` , data = ames_raw_2008)
+pred_2009<-exp(predict(lmfit_2008some,newdata=ames_raw_2009))
+calc_loss(pred_2009,ames_raw_2009$SalePrice)
 ```
 
 Your answer:
 
 ```         
-Please write your answer in full sentences.
+All the predictors are statistically significant, I don't know how to add a interaction. 
 ```
 
 -   Is there evidence of non-linear association between any of the
@@ -448,7 +465,8 @@ Please write your answer in full sentences.
 Your code:
 
 ```{r,echo=TRUE}
-#
+library(ISLR2)
+Auto
 #
 ```
 
