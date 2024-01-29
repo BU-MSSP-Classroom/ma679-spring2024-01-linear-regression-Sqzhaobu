@@ -324,7 +324,7 @@ Here are few rules: - You are not allowed to use the test data. - You
 cannot use automatic variable selection. - You need to explain why you
 added each variable.
 
-```{r,eval=FALSE,echo=show_code}
+```{r, echo=show_code}
 lmfit_2008<- lm(log(SalePrice) ~ log(`Lot Area`)+`Year Built`+`Year Remod/Add` + `Total Bsmt SF` + `1st Flr SF` +  log(`Gr Liv Area`) + `Bsmt Full Bath`  + `TotRms AbvGrd` + `Garage Area` + `Wood Deck SF` + `Open Porch SF` , data = ames_raw_2008) # use ames_raw_2008
 lmfit_2008
 ```
@@ -364,17 +364,19 @@ lmfit_2008all = lm(log(SalePrice) ~ log(`Lot Area`)+`Year Built`+`Year Remod/Add
 pred_2009<-exp(predict(lmfit_2008all,newdata=ames_raw_2009))
 calc_loss(pred_2009,ames_raw_2009$SalePrice)
 ```
+
 ```{r}
 summary(lmfit_2008all)
 ```
 
-
 Your answer:
+
 ```{r}
 lmfit_2008some = lm(log(SalePrice) ~ log(`Lot Area`)+`Year Built`+`Year Remod/Add` + `Total Bsmt SF` + `1st Flr SF` + `Low Qual Fin SF` + log(`Gr Liv Area`) + `Bsmt Full Bath` + `Bsmt Half Bath` + `TotRms AbvGrd` + `Garage Area` + `Wood Deck SF` + `Open Porch SF` , data = ames_raw_2008)
 pred_2009<-exp(predict(lmfit_2008some,newdata=ames_raw_2009))
 calc_loss(pred_2009,ames_raw_2009$SalePrice)
 ```
+
 ```{r}
 summary(lmfit_2008some)
 ```
@@ -460,33 +462,36 @@ Please write your answer in full sentences.
 
 (a) Use the lm() function to perform a simple linear regression with mpg
     as the response and horsepower as the predictor. Use the summary()
-    function to print the results.
+    function to print the results. mpg(miles per gallon)
 
 Your code:
 
 ```{r,echo=TRUE}
-library(ISLR2)
-Auto
-#
+Auto = read.csv('Auto.csv')
+lmfitAuto = lm(mpg ~ horsepower, data = Auto)
+summary(lmfitAuto)
 ```
 
 Your answer:
 
 ```         
-Please write your answer in full sentences.
+Horsepower is statistically significant. When increase one horsepower, mpg is expected to decrease 0.158. 
 ```
 
 Comment on the output. For example: i. Is there a relationship between
 the predictor and the response?
 
 ii. How strong is the relationship between the predictor and the
-    response?
-
+    response? More than 99% confidence.
 iii. Is the relationship between the predictor and the response positive
-     or negative?
-
+     or negative? Negative
 iv. What is the predicted mpg associated with a horsepower of 98? What
     are the associated 95% confidence and prediction intervals?
+
+```{r}
+predicted_mpg <- predict(lmfitAuto, newdata = data.frame(horsepower = 98), interval = "confidence")
+predicted_mpg
+```
 
 <!-- -->
 
@@ -495,8 +500,15 @@ iv. What is the predicted mpg associated with a horsepower of 98? What
 
 Your code:
 
-```{r,echo=TRUE}
-#
+```{r,echo=show_code,fig.width=7,fig.height=4.5}
+ggplot(Auto)+
+  geom_point()+
+  aes(x = horsepower, y = mpg)+
+  xlab("horsepower")+
+  ylab("mpg")+
+  geom_abline(slope = -0.158, intercept = 39.93, col = "blue", size = 1)+
+  theme_bw()
+ 
 #
 ```
 
@@ -512,15 +524,14 @@ Please write your answer in full sentences.
 
 Your code:
 
-```{r,echo=TRUE}
-#
-#
+```{r,echo=show_code,fig.width=7,fig.height=4.5}
+plot(lmfitAuto)
 ```
 
 Your answer:
 
 ```         
-Please write your answer in full sentences.
+These plot show that the residual is not a normal distribution which mean that the model could be improved. 
 ```
 
 9.  This question involves the use of multiple linear regression on the
@@ -533,15 +544,14 @@ Please write your answer in full sentences.
 
 Your code:
 
-```{r,echo=TRUE}
-#
-#
+```{r,echo=show_code,fig.width=7,fig.height=7}
+pairs(subset(Auto, select = -name), pch = 1)
 ```
 
 Your answer:
 
 ```         
-Please write your answer in full sentences.
+From this graph, there is obvious correlation between several predictors. 
 ```
 
 (b) Compute the matrix of correlations between the variables using the
@@ -551,14 +561,14 @@ Please write your answer in full sentences.
 Your code:
 
 ```{r,echo=TRUE}
-#
+cor(subset(Auto, select = -name))
 #
 ```
 
 Your answer:
 
 ```         
-Please write your answer in full sentences.
+High corelation between displacement, cylinders, horsepower and weight. 
 ```
 
 (c) Use the lm() function to perform a multiple linear regression with
@@ -568,21 +578,23 @@ Please write your answer in full sentences.
 Your code:
 
 ```{r,echo=TRUE}
-#
-#
+lmfitAutoall = lm(mpg ~ cylinders + displacement + horsepower + weight + acceleration + year + origin, data = Auto)
+summary(lmfitAutoall)
 ```
 
 Your answer:
 
 ```         
-Please write your answer in full sentences.
+Displacement, weight, year, origin are significant while others are not. There is a relationship betweeen the predictors and the response as the R square is high. 
 ```
 
 Comment on the output. For instance: i. Is there a relationship between
 the predictors and the response? ii. Which predictors appear to have a
 statistically significant relationship to the response?
 
-iii. What does the coefficient for the year variable suggest?
+iii. What does the coefficient for the year variable suggest? The year
+     is statistically significant. When year increase 1, mpg is expected
+     to increased 0.75. <!-- -->
 
 <!-- -->
 
@@ -594,15 +606,15 @@ iii. What does the coefficient for the year variable suggest?
 
 Your code:
 
-```{r,echo=TRUE}
-#
+```{r,echo=TRUE, fig.width=7,fig.height=5}
+plot(lmfitAutoall)
 #
 ```
 
 Your answer:
 
 ```         
-Please write your answer in full sentences.
+    325, 324, 321 are unusual outliers. 14 has a high leverage. 
 ```
 
 (e) Use the \* and : symbols to fit linear regression models with
@@ -613,14 +625,37 @@ Please write your answer in full sentences.
 Your code:
 
 ```{r,echo=TRUE}
-#
-#
+# Fit a linear regression model with interactions between two predictors
+lmAuto_i <- lm(mpg ~ cylinders * displacement + 
+                                    cylinders * horsepower + 
+                                    cylinders * weight + 
+                                    cylinders * acceleration + 
+                                    cylinders * year + 
+                                    cylinders * origin +
+                                    displacement * horsepower + 
+                                    displacement * weight + 
+                                    displacement * acceleration + 
+                                    displacement * year + 
+                                    displacement * origin +
+                                    horsepower * weight + 
+                                    horsepower * acceleration + 
+                                    horsepower * year + 
+                                    horsepower * origin +
+                                    weight * acceleration + 
+                                    weight * year + 
+                                    weight * origin +
+                                    acceleration * year + 
+                                    acceleration * origin +
+                                    year * origin, 
+                            data = Auto)
+summary(lmAuto_i)
 ```
 
 Your answer:
 
 ```         
-Please write your answer in full sentences.
+displacement:year, acceleration:year, acceleration:origin are significant. 
+I add all the interactions and choose the interactions with low p value. 
 ```
 
 (f) Try a few different transformations of the variables, such as
@@ -632,46 +667,34 @@ multiple regression model to predict Sales using Price, Urban, and US.
 Your code:
 
 ```{r,echo=TRUE}
-#
-#
+library(ISLR2)
+lmCarseats = lm(Sales ~ Price + Urban + US, data = Carseats)
+summary(lmCarseats)
 ```
 
 Your answer:
 
 ```         
-Please write your answer in full sentences.
+It is not a good model as the R is too low. While p value of F is pretty high.
 ```
 
 (b) Provide an interpretation of each coefficient in the model. Be
     careful---some of the variables in the model are qualitative!
 
-Your code:
-
-```{r,echo=TRUE}
-#
-#
-```
-
 Your answer:
 
 ```         
-Please write your answer in full sentences.
+We failed to reject that urban won't influence Sales.
+When US is yes, sales is expected to increase 1.2 compare to US is no when others fix. 
+When price increase 1, sales is expected to decrease 0.05 when others fix. 
 ```
 
 (c) Write out the model in equation form, being careful to handle the
     qualitative variables properly.
 
-Your code:
-
-```{r,echo=TRUE}
-#
-#
-```
-
 Your answer:
-
-```         
-Please write your answer in full sentences.
+```
+$$ \text{Sales} = 13.043469 - 0.054459 \times \text{Price} - 0.021916 \times \text{UrbanYes} + 1.200573 \times \text{USYes} + \varepsilon $$
 ```
 
 (d) For which of the predictors can you reject the null hypothesis
@@ -680,7 +703,7 @@ Please write your answer in full sentences.
 Your answer:
 
 ```         
-Please write your answer in full sentences.
+Price and US. 
 ```
 
 (e) On the basis of your response to the previous question, fit a
@@ -690,14 +713,8 @@ Please write your answer in full sentences.
 Your code:
 
 ```{r,echo=TRUE}
-#
-#
-```
-
-Your answer:
-
-```         
-Please write your answer in full sentences.
+lmCarseats_s = lm(Sales ~ Price + US, data = Carseats)
+summary(lmCarseats_s)
 ```
 
 (f) How well do the models in (a) and (e) fit the data?
@@ -705,7 +722,7 @@ Please write your answer in full sentences.
 Your answer:
 
 ```         
-Please write your answer in full sentences.
+The model in (e) is a little bit better than the model in (a). But as the ajusted R square is too low, the model both didn't fit well. 
 ```
 
 (g) Using the model from (e), obtain 95% confidence intervals for the
@@ -714,8 +731,8 @@ Please write your answer in full sentences.
 Your code:
 
 ```{r,echo=TRUE}
-#
-#
+conf_intervals <- confint(lmCarseats_s)
+conf_intervals
 ```
 
 Your answer:
@@ -729,8 +746,12 @@ Please write your answer in full sentences.
 
 Your answer:
 
+```{r,echo=TRUE, fig.width=7,fig.height=5}
+plot(lmCarseats_s)
+```
+
 ```         
-Please write your answer in full sentences.
+Yes, 69, 37, 51 are outliers and the point 26, 50, 368 are high leverage observations. 
 ```
 
 ## Additional Material
